@@ -12,34 +12,15 @@ import pandas as pd
 import sys
 import pdb
 import time
-import yaml
-from pathlib import Path
 
-from functions_seasonal import (
+from pyseasonal.config import load_config
+from pyseasonal.functions_seasonal import (
     get_forecast_prob,
     apply_sea_mask,
     transform_gcm_variable,
     assign_season_label,
     flip_latitudes_and_data
 )
-
-
-def load_config(config_file):
-    """Load configuration from YAML file"""
-    config_path = Path(__file__).parent.parent / config_file
-    print('The path of the configuration file is '+str(config_path))
-    with open(config_path, 'r') as file:
-        config = yaml.safe_load(file)
-
-    # Setup paths based on GCM_STORE environment variable
-    gcm_store = os.getenv('GCM_STORE', 'lustre')
-    if gcm_store in config['paths']:
-        paths = config['paths'][gcm_store]
-        config['paths'] = paths
-    else:
-        raise Exception(f'ERROR: unknown entry for <gcm_store> !')
-
-    return config
 
 
 # CREATE LIST CONTAINING ALL DOMAINS TO BE PROCESSED ######################################

@@ -10,9 +10,8 @@ import pandas as pd
 import dask
 import sys
 import pdb
-import yaml
-from pathlib import Path
 
+from pyseasonal.config import load_config_argo
 
 def load_config(config_file):
     """Load configuration from YAML file"""
@@ -70,7 +69,8 @@ for do in np.arange(len(domain_list)):
 
 
     # Load configuration
-    config = load_config(configuration_file)
+    config = load_config_argo(configuration_file)
+
 
     # # Example year and run to run without passing any input arguments; comment or delete the next two lines in operative use
     # year_init = 2024 #a list containing the years the forecast are initialized on, will be looped through with yy
