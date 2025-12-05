@@ -48,6 +48,20 @@ domain_list = ['Iberia','Canarias','medcof']
 
 ####################################################################
 
+#the init of the forecast (year and month) can passed by bash; if nothing is passed these parameters will be set by python
+if len(sys.argv) == 2:
+    print("Reading from input parameters passed via bash")
+    year_init = str(sys.argv[1])[0:4]
+    month_init = str(sys.argv[1])[-2:]
+    if len(year_init) != 4 or len(month_init) != 2:
+        raise Exception('ERROR: check length of <year_month_init> input parameter !')
+else:
+    print("No input parameter have been provided by the user and the script will set the <year_init> and <month_init> variables for the year and month of the current date...")
+    year_init = str(date.today().year)
+    month_init = f"{date.today().month:02d}"
+    print(date.today())
+print(year_init, month_init)
+
 for do in np.arange(len(domain_list)):
 
     ## CONSTRUCT CONFIGURATION FILE ######################################
@@ -58,20 +72,6 @@ for do in np.arange(len(domain_list)):
 
     # Load configuration
     config = load_config(configuration_file)
-
-    #the init of the forecast (year and month) can passed by bash; if nothing is passed these parameters will be set by python
-    if len(sys.argv) == 2:
-        print("Reading from input parameters passed via bash")
-        year_init = str(sys.argv[1])[0:4]
-        month_init = str(sys.argv[1])[-2:]
-        if len(year_init) != 4 or len(month_init) != 2:
-            raise Exception('ERROR: check length of <year_month_init> input parameter !')
-    else:
-        print("No input parameter have been provided by the user and the script will set the <year_init> and <month_init> variables for the year and month of the current date...")
-        year_init = str(date.today().year)
-        month_init = f"{date.today().month:02d}"
-        print(date.today())
-    print(year_init, month_init)
 
     # # overwrite the aformentioned variables for develompment purposes
     # year_init = 2024 #a list containing the years the forecast are initialized on, will be looped through with yy
