@@ -14,8 +14,8 @@ import os
 import pandas as pd
 import pdb #then type <pdb.set_trace()> at a given line in the code below
 
-from pyseasonal.config import load_config
-from pyseasonal.functions_seasonal import transform_gcm_variable
+from pyseasonal.utils.config import load_config
+from pyseasonal.utils.functions_seasonal import transform_gcm_variable
 
 # INDICATE CONFIGURATION FILE ######################################
 

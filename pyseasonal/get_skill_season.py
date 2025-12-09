@@ -14,8 +14,8 @@ import time
 import pdb #then type <pdb.set_trace()> at a given line in the code below
 import psutil
 
-from pyseasonal.config import load_config_argo
-from pyseasonal.functions_seasonal import apply_sea_mask, lin_detrend, get_reliability_or_roc
+from pyseasonal.utils.config import load_config_argo
+from pyseasonal.utils.functions_seasonal import apply_sea_mask, lin_detrend, get_reliability_or_roc
 
 start_time = time.time()
 

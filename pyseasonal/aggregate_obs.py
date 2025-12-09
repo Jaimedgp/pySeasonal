@@ -9,7 +9,7 @@ import os
 import pandas as pd
 import pdb
 
-from pyseasonal.config import load_config
+from pyseasonal.utils.config import load_config
 
 # INDICATE CONFIGURATION FILE ######################################
 

@@ -13,8 +13,8 @@ import sys
 import pdb
 import time
 
-from pyseasonal.config import load_config
-from pyseasonal.functions_seasonal import (
+from pyseasonal.utils.config import load_config
+from pyseasonal.utils.functions_seasonal import (
     get_forecast_prob,
     apply_sea_mask,
     transform_gcm_variable,

@@ -12,8 +12,8 @@ import os
 import pdb as pdb #then type <pdb.set_trace()> at a given line in the code below
 import time
 
-from pyseasonal.config import load_config
-from pyseasonal.functions_seasonal import (
+from pyseasonal.utils.config import load_config
+from pyseasonal.utils.functions_seasonal import (
     apply_sea_mask,
     get_sub_domain,
     get_spatial_aggregation,
