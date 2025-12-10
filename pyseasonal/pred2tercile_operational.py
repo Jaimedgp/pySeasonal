@@ -4,16 +4,13 @@ The script loads a forecast at a given init passed via the <year_init> and <mont
 The main difference to pred2tercile.py is that only one init is processed, meaning that the yy loop has been deleted here.'''
 
 #load packages
-from datetime import date
 import numpy as np
 import xarray as xr
 import os
 import pandas as pd
-import sys
 import pdb
 import time
 
-from pyseasonal.utils.config import load_config
 from pyseasonal.utils.functions_seasonal import (
     get_forecast_prob,
     apply_sea_mask,
@@ -23,41 +20,8 @@ from pyseasonal.utils.functions_seasonal import (
 )
 
 
-# CREATE LIST CONTAINING ALL DOMAINS TO BE PROCESSED ######################################
-
-domain_list = ['Iberia','Canarias','medcof']
-
-####################################################################
-
-#the init of the forecast (year and month) can passed by bash; if nothing is passed these parameters will be set by python
-if len(sys.argv) == 2:
-    print("Reading from input parameters passed via bash")
-    year_init = str(sys.argv[1])[0:4]
-    month_init = str(sys.argv[1])[-2:]
-    if len(year_init) != 4 or len(month_init) != 2:
-        raise Exception('ERROR: check length of <year_month_init> input parameter !')
-else:
-    print("No input parameter have been provided by the user and the script will set the <year_init> and <month_init> variables for the year and month of the current date...")
-    year_init = str(date.today().year)
-    month_init = f"{date.today().month:02d}"
-    print(date.today())
-print(year_init, month_init)
-
-for do in np.arange(len(domain_list)):
-
-    ## CONSTRUCT CONFIGURATION FILE ######################################
-
-    configuration_file = 'config/config_for_pred2tercile_operational_'+domain_list[do]+'.yaml'
-
-    ######################################################################
-
-    # Load configuration
-    config = load_config(configuration_file)
-
-    # # overwrite the aformentioned variables for develompment purposes
-    # year_init = 2024 #a list containing the years the forecast are initialized on, will be looped through with yy
-    # month_init = 10 #a list containing the corresponding months the forecast are initialized on, will be called while looping through <year_init> (with yy), i.e. must have the same length
-
+def swen_pred2tercile_operational(config, year_init, month_init):
+    ''' Main function to generate tercile probability forecasts from raw GCM output for a given initialization date.'''
     # Extract configuration variables
     models = config['models']
     version = config['version']
@@ -369,6 +333,3 @@ for do in np.arange(len(domain_list)):
             del(nc_quantile)
 
         print('INFO: pred2tercile_operational.py has been run successfully ! The netcdf output file containing the tercile probability forecasts has been stored at '+dir_forecast+'/'+domain)
-
-quit()
-#sys.exit(0)
