@@ -20,7 +20,7 @@ from io import StringIO
 # Add parent directory to path to import pyseasonal
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from pyseasonal.functions_seasonal import get_years_of_subperiod
+from pyseasonal.utils.functions_seasonal import get_years_of_subperiod
 
 
 class TestValidSubperiods:

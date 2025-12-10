@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import xarray as xr
 import xskillscore as xs
 
-from pyseasonal.mapping import subperiod_years
+from pyseasonal.utils.mapping import subperiod_years
 
 
 def flip_latitudes_and_data(xr_ds_f,lat_name):

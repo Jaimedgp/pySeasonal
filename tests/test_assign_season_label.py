@@ -18,7 +18,7 @@ from pathlib import Path
 # Add parent directory to path to import pyseasonal
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from pyseasonal.functions_seasonal import assign_season_label
+from pyseasonal.utils.functions_seasonal import assign_season_label
 
 
 class TestSingleMonthSeasons:

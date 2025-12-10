@@ -4,9 +4,8 @@ from pathlib import Path
 import yaml
 
 
-def load_config(config_file):
+def load_config(config_path):
     """Load configuration from YAML file"""
-    config_path = Path(__file__).parent.parent / config_file
     print('The path of the configuration file is '+str(config_path))
     with open(config_path, 'r') as file:
         config = yaml.safe_load(file)
@@ -22,9 +21,8 @@ def load_config(config_file):
     return config
 
 
-def load_config_argo(config_file):
+def load_config_argo(config_path):
     """Load configuration from YAML file"""
-    config_path = Path(__file__).parent.parent / config_file
     print('The path of the configuration file is '+str(config_path))
     with open(config_path, 'r') as file:
         config = yaml.safe_load(file)
