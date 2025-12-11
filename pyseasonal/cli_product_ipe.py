@@ -12,10 +12,7 @@ def main_ipe(
 ):
     config = load_config_argo(config_file)
 
-    raise NotImplementedError(
-        "The swen_seas2ipe function is not implemented yet. Please check the implementation."
-    )
-    # swen_seas2ipe(config, year, month)
+    swen_seas2ipe(config, str(year), f"{month:02d}",)
 
 
 if __name__ == "__main__":

@@ -12,10 +12,7 @@ def main_pred2tercile(
 ) -> None:
     config = load_config(config_file)
 
-    raise NotImplementedError(
-        "The swen_pred2tercile_operational function is not implemented yet. Please check the implementation."
-    )
-    # swen_pred2tercile_operational(config, year, month)
+    swen_pred2tercile_operational(config, str(year), f"{month:02d}")
 
 
 if __name__ == "__main__":

@@ -20,7 +20,7 @@ from pyseasonal.utils.functions_seasonal import (
 )
 
 
-def swen_pred2tercile_operational(config, year_init, month_init):
+def swen_pred2tercile_operational(config: dict, year_init: str, month_init: str):
     ''' Main function to generate tercile probability forecasts from raw GCM output for a given initialization date.'''
     # Extract configuration variables
     models = config['models']
