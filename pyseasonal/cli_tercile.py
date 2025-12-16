@@ -10,6 +10,21 @@ def main_pred2tercile(
     year: int = date.today().year,
     month: int = date.today().month,
 ) -> None:
+    """
+    CLI entry point for operational tercile prediction processing.
+
+    Loads configuration and calls swen_pred2tercile_operational to generate
+    tercile probability forecasts for the specified year and month.
+
+    Parameters:
+    -----------
+    config_file : str or Path
+        Path to YAML configuration file
+    year : int, optional
+        Forecast year (default: current year)
+    month : int, optional
+        Forecast month (default: current month)
+    """
     config = load_config(config_file)
 
     swen_pred2tercile_operational(config, str(year), f"{month:02d}")
