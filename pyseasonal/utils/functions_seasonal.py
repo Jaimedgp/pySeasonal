@@ -224,7 +224,6 @@ def roll_and_cut(xr_dataset, lonlim_f, latlim_f):
     shiftat = int(np.argmax(np.abs(np.diff(xr_dataset.longitude.values)))-1)
     xr_dataset = xr_dataset.roll(longitude=shiftat,roll_coords=True)
 
-    #then cut out target region and return new dataset
     lonind = (xr_dataset.longitude.values >= lonlim_f[0]) & (xr_dataset.longitude.values <= lonlim_f[1])
     latind = (xr_dataset.latitude.values >= latlim_f[0]) & (xr_dataset.latitude.values <= latlim_f[1])
     xr_dataset = xr_dataset.isel(longitude=lonind,latitude=latind)
@@ -471,6 +470,7 @@ def transform_gcm_variable(ds_f,var_in_f,var_out_f,model_f,version_f):
         else:
             raise Exception('ERROR: Unknown value for <ds_f[var_in_f]> !')
         ds_f[var_in_f].attrs['units'] = 'daily mean '+var_out_f+' in Kelvin'
+
     elif (var_in_f in ('pr','rsds')) & (model_f+version_f in ('ecmwf51','cmcc35','cmcc4','eccc5','dwd22')):
         print('Info: Disaggregate '+var_in_f+' accumulated over the '+str(len(ds_f.time))+' days forecast period from '+model_f+version_f+' to daily sums.')
         vals_disagg = np.diff(ds_f[var_in_f].values,n=1,axis=0)
@@ -523,6 +523,7 @@ def get_reliability_or_roc(obs_f,gcm_f,obs_quantile_f,gcm_quantile_f,dist_part_f
     elif dist_part_f in ('center_tercile','centre_tercile'):
         obs_bin = xr.where((obs_f > obs_lower_tercile_f) & (obs_f <= obs_upper_tercile_f), 1, 0).astype('int8') #here the nan values over the sea are lost. They will be brought back below.
         gcm_bin = xr.where((gcm_f > gcm_lower_tercile_f) & (gcm_f <= gcm_upper_tercile_f), 1, 0).astype('int8')
+
     else:
         raise Exception("ERROR: check entry for dist_part_f !")
 
