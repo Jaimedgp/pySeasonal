@@ -13,7 +13,6 @@ import xskillscore as xs
 
 from pyseasonal.utils.mapping import subperiod_years
 
-
 def flip_latitudes_and_data(xr_ds_f,lat_name):
     ''' flips latitudes and data variables in xr_ds_f; input: xr_df_f is an xarray dataseet and lat_name a string containing the placeholder name for the latitude in that dataset;
     output: flipped xr_ds_f '''
@@ -370,8 +369,8 @@ def get_sub_domain(xr_ds_f,domain_f):
         # lonind_f = xr_ds_f.x.values >= -1
         # xr_ds_f.loc[dict(y=latind_f, x=lonind_f)] = np.nan
     elif domain_f == 'medcof2': #this domain is identical to the medcof domain, but does not include the Sahara desert. The SPEI does not cover this area.
-        lat_bool = (xr_ds_f.y.values >= 28) and (xr_ds_f.y.values <= 90)
-        lon_bool = (xr_ds_f.x.values >= -16) and (xr_ds_f.x.values <= 180)
+        lat_bool = (xr_ds_f.y.values >= 28) & (xr_ds_f.y.values <= 90)
+        lon_bool = (xr_ds_f.x.values >= -16) & (xr_ds_f.x.values <= 180)
         xr_ds_f = xr_ds_f.isel(y=lat_bool,x=lon_bool)
     else:
         raise Exception('ERROR: check entry for the <sub_domain> input parameter !')

@@ -26,12 +26,10 @@ dependencies = [
     "xesmf>=0.8.10",
     "xskillscore>=0.0.26",
 ]
-
 [project.optional-dependencies]
 dev = [
     "pytest>=8.0.0",
     "pytest-cov>=4.0.0",
-    "pyseasonal",
 ]
 
 [project.urls]
