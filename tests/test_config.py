@@ -8,20 +8,19 @@ Tests cover:
   - Valid paths that exist
   - Missing paths that should raise FileNotFoundError
   - Paths with 'filename' in key (should be skipped)
+  - Empty 'home' path (should be skipped)
   - Empty dictionaries
 - load_config() function
   - Valid config file loading
-  - Environment variable handling (GCM_STORE)
   - Path validation within config
   - Invalid/missing config files
-  - Missing GCM_STORE in config
+  - Missing 'paths' section
   - YAML structure validation
 """
 
 import os
 import pytest
 from pathlib import Path
-from unittest.mock import patch
 
 from pyseasonal.utils.config import _check_paths_exist, load_config
 
@@ -75,6 +74,29 @@ class TestCheckPathsExist:
         # Should not raise error because 'filename' keys are skipped
         assert _check_paths_exist(paths_dict) is True
 
+    def test_skip_empty_home_path(self, tmp_path):
+        """Should skip validation for empty 'home' path."""
+        existing_dir = tmp_path / "exists"
+        existing_dir.mkdir()
+
+        paths_dict = {
+            "existing_path": str(existing_dir),
+            "home": ""  # Empty home path should be skipped
+        }
+
+        # Should not raise error because empty 'home' is allowed
+        assert _check_paths_exist(paths_dict) is True
+
+    def test_non_empty_home_path_must_exist(self, tmp_path):
+        """Should validate non-empty 'home' path."""
+        paths_dict = {
+            "home": "/this/path/does/not/exist"
+        }
+
+        # Non-empty home path must exist
+        with pytest.raises(FileNotFoundError, match="Path for 'home' does not exist"):
+            _check_paths_exist(paths_dict)
+
     def test_empty_dictionary(self):
         """Should return True for empty dictionary."""
         assert _check_paths_exist({}) is True
@@ -98,12 +120,26 @@ class TestCheckPathsExist:
         with pytest.raises(FileNotFoundError):
             _check_paths_exist(paths_dict)
 
+    def test_combination_of_skipped_and_validated_paths(self, tmp_path):
+        """Should properly handle mix of skipped and validated paths."""
+        valid_dir = tmp_path / "valid"
+        valid_dir.mkdir()
+
+        paths_dict = {
+            "home": "",  # Skip empty home
+            "valid_path": str(valid_dir),  # Validate this
+            "output_filename": "/fake/file.nc",  # Skip filename
+            "config_filename": "/another/fake.yaml"  # Skip filename
+        }
+
+        assert _check_paths_exist(paths_dict) is True
+
 
 class TestLoadConfig:
     """Test cases for load_config() function."""
 
-    def test_load_valid_config_default_gcm_store(self, tmp_path, capsys):
-        """Should successfully load config with default GCM_STORE (lustre)."""
+    def test_load_valid_config(self, tmp_path, capsys):
+        """Should successfully load config with valid paths."""
         # Create a test config file
         config_file = tmp_path / "test_config.yaml"
         test_dir = tmp_path / "test_data"
@@ -115,18 +151,13 @@ version: ['51', '4']
 domain: 'medcof'
 
 paths:
-  lustre:
-    home: '{str(test_dir)}'
-    path_gcm_base: '{str(test_dir)}'
-    dir_forecast: '{str(test_dir)}'
-  pticlima:
-    home: '/other/path'
+  home: '{str(test_dir)}'
+  path_gcm_base: '{str(test_dir)}'
+  dir_forecast: '{str(test_dir)}'
 """
         config_file.write_text(config_content)
 
-        # Load config with default GCM_STORE
-        with patch.dict(os.environ, {'GCM_STORE': 'lustre'}):
-            config = load_config(str(config_file))
+        config = load_config(str(config_file))
 
         # Verify config structure
         assert 'models' in config
@@ -139,51 +170,25 @@ paths:
         captured = capsys.readouterr()
         assert f"The path of the configuration file is {str(config_file)}" in captured.out
 
-    def test_load_config_custom_gcm_store(self, tmp_path):
-        """Should load config with custom GCM_STORE environment variable."""
+    def test_load_config_with_empty_home(self, tmp_path):
+        """Should load config with empty home path."""
         config_file = tmp_path / "test_config.yaml"
-        test_dir1 = tmp_path / "lustre_data"
-        test_dir2 = tmp_path / "custom_data"
-        test_dir1.mkdir()
-        test_dir2.mkdir()
-
-        config_content = f"""
-domain: 'iberia'
-
-paths:
-  lustre:
-    home: '{str(test_dir1)}'
-  custom:
-    home: '{str(test_dir2)}'
-    data_path: '{str(test_dir2)}'
-"""
-        config_file.write_text(config_content)
-
-        # Load with custom GCM_STORE
-        with patch.dict(os.environ, {'GCM_STORE': 'custom'}):
-            config = load_config(str(config_file))
-
-        assert config['paths']['home'] == str(test_dir2)
-        assert config['paths']['data_path'] == str(test_dir2)
-
-    def test_invalid_gcm_store_raises_error(self, tmp_path):
-        """Should raise ValueError when GCM_STORE not in config."""
-        config_file = tmp_path / "test_config.yaml"
-        test_dir = tmp_path / "test_data"
+        test_dir = tmp_path / "data"
         test_dir.mkdir()
 
         config_content = f"""
+domain: 'test'
+
 paths:
-  lustre:
-    home: '{str(test_dir)}'
-  pticlima:
-    home: '{str(test_dir)}'
+  home: ''
+  data_path: '{str(test_dir)}'
 """
         config_file.write_text(config_content)
 
-        with patch.dict(os.environ, {'GCM_STORE': 'invalid_store'}):
-            with pytest.raises(ValueError, match="Unknown entry for <gcm_store>"):
-                load_config(str(config_file))
+        config = load_config(str(config_file))
+
+        assert config['paths']['home'] == ''
+        assert config['paths']['data_path'] == str(test_dir)
 
     def test_missing_paths_in_config_raises_error(self, tmp_path):
         """Should raise FileNotFoundError when paths in config don't exist."""
@@ -191,15 +196,13 @@ paths:
 
         config_content = """
 paths:
-  lustre:
-    home: '/this/path/does/not/exist'
-    data_dir: '/neither/does/this'
+  home: '/this/path/does/not/exist'
+  data_dir: '/neither/does/this'
 """
         config_file.write_text(config_content)
 
-        with patch.dict(os.environ, {'GCM_STORE': 'lustre'}):
-            with pytest.raises(FileNotFoundError, match="Path for .* does not exist"):
-                load_config(str(config_file))
+        with pytest.raises(FileNotFoundError, match="Path for .* does not exist"):
+            load_config(str(config_file))
 
     def test_file_not_found(self):
         """Should raise FileNotFoundError when config file doesn't exist."""
@@ -223,9 +226,8 @@ domain: 'medcof'
 """
         config_file.write_text(config_content)
 
-        with patch.dict(os.environ, {'GCM_STORE': 'lustre'}):
-            with pytest.raises(KeyError):
-                load_config(str(config_file))
+        with pytest.raises(KeyError):
+            load_config(str(config_file))
 
     def test_config_preserves_non_path_fields(self, tmp_path):
         """Should preserve all non-path configuration fields."""
@@ -243,8 +245,7 @@ precip_threshold_quotient: 30
 datatype: 'float32'
 
 paths:
-  lustre:
-    home: '{str(test_dir)}'
+  home: '{str(test_dir)}'
 
 model_settings:
   ecmwf51:
@@ -253,8 +254,7 @@ model_settings:
 """
         config_file.write_text(config_content)
 
-        with patch.dict(os.environ, {'GCM_STORE': 'lustre'}):
-            config = load_config(str(config_file))
+        config = load_config(str(config_file))
 
         # Verify all fields are preserved
         assert config['models'] == ['ecmwf', 'cmcc']
@@ -275,38 +275,54 @@ model_settings:
 
         config_content = f"""
 paths:
-  lustre:
-    home: '{str(test_dir)}'
-    output_filename: '/non/existent/output.nc'
-    input_filename_pattern: '/non/existent/pattern.nc'
+  home: '{str(test_dir)}'
+  output_filename: '/non/existent/output.nc'
+  input_filename_pattern: '/non/existent/pattern.nc'
 """
         config_file.write_text(config_content)
 
-        with patch.dict(os.environ, {'GCM_STORE': 'lustre'}):
-            config = load_config(str(config_file))
+        config = load_config(str(config_file))
 
         # Should not raise error, filenames are not validated
         assert config['paths']['output_filename'] == '/non/existent/output.nc'
         assert config['paths']['input_filename_pattern'] == '/non/existent/pattern.nc'
 
     def test_empty_config_file(self, tmp_path):
-        """Should raise TypeError when config file is empty."""
+        """Should raise error when config file is empty."""
         config_file = tmp_path / "empty_config.yaml"
         config_file.write_text("")
 
-        with patch.dict(os.environ, {'GCM_STORE': 'lustre'}):
-            # Empty YAML returns None, which causes TypeError
-            with pytest.raises(TypeError):
-                load_config(str(config_file))
+        # Empty YAML returns None, which causes error when accessing ['paths']
+        with pytest.raises((KeyError, TypeError)):
+            load_config(str(config_file))
+
+    def test_paths_section_is_validated(self, tmp_path):
+        """Should validate all paths in the 'paths' section."""
+        config_file = tmp_path / "test_config.yaml"
+        existing_dir = tmp_path / "exists"
+        existing_dir.mkdir()
+
+        config_content = f"""
+domain: 'test'
+
+paths:
+  home: ''
+  valid_path: '{str(existing_dir)}'
+  invalid_path: '/does/not/exist'
+"""
+        config_file.write_text(config_content)
+
+        with pytest.raises(FileNotFoundError, match="Path for 'invalid_path' does not exist"):
+            load_config(str(config_file))
 
 
 class TestLoadConfigIntegration:
-    """Integration tests using actual config files from the project."""
+    """Integration tests using realistic config structures."""
 
-    def test_load_actual_config_structure(self, tmp_path):
+    def test_load_realistic_config_structure(self, tmp_path):
         """Test loading config with realistic structure similar to project configs."""
         config_file = tmp_path / "realistic_config.yaml"
-
+        
         # Create necessary directories
         home_dir = tmp_path / "home"
         gcm_base = tmp_path / "gcm_base"
@@ -317,7 +333,7 @@ class TestLoadConfigIntegration:
         forecast_dir = tmp_path / "forecast"
         mask_dir = tmp_path / "masks"
 
-        for directory in [home_dir, gcm_base, gcm_derived, gcm_masked,
+        for directory in [home_dir, gcm_base, gcm_derived, gcm_masked, 
                          rundir, quantile_dir, forecast_dir, mask_dir]:
             directory.mkdir()
 
@@ -338,15 +354,14 @@ product: 'forecast'
 quantile_threshold: [0.33, 0.67]
 
 paths:
-  lustre:
-    home: '{str(home_dir)}'
-    path_gcm_base: '{str(gcm_base)}'
-    path_gcm_base_derived: '{str(gcm_derived)}'
-    path_gcm_base_masked: '{str(gcm_masked)}'
-    rundir: '{str(rundir)}'
-    dir_quantile: '{str(quantile_dir)}'
-    dir_forecast: '{str(forecast_dir)}'
-    mask_dir: '{str(mask_dir)}'
+  home: '{str(home_dir)}'
+  path_gcm_base: '{str(gcm_base)}'
+  path_gcm_base_derived: '{str(gcm_derived)}'
+  path_gcm_base_masked: '{str(gcm_masked)}'
+  rundir: '{str(rundir)}'
+  dir_quantile: '{str(quantile_dir)}'
+  dir_forecast: '{str(forecast_dir)}'
+  mask_dir: '{str(mask_dir)}'
 
 model_settings:
   ecmwf51:
@@ -360,8 +375,7 @@ model_settings:
 """
         config_file.write_text(config_content)
 
-        with patch.dict(os.environ, {'GCM_STORE': 'lustre'}):
-            config = load_config(str(config_file))
+        config = load_config(str(config_file))
 
         # Verify structure
         assert config['models'] == ['eccc', 'ecmwf']
@@ -372,28 +386,33 @@ model_settings:
         assert 'model_settings' in config
         assert 'ecmwf51' in config['model_settings']
 
-
-class TestEdgeCases:
-    """Test edge cases and boundary conditions."""
-
-    def test_gcm_store_not_set_uses_default(self, tmp_path):
-        """Should use 'lustre' as default when GCM_STORE not set."""
+    def test_config_with_empty_home_and_filenames(self, tmp_path):
+        """Test config with empty home and filename entries (common pattern)."""
         config_file = tmp_path / "test_config.yaml"
-        test_dir = tmp_path / "test_data"
-        test_dir.mkdir()
+        data_dir = tmp_path / "data"
+        data_dir.mkdir()
 
         config_content = f"""
+domain: 'argo'
+
 paths:
-  lustre:
-    home: '{str(test_dir)}'
+  home: ''
+  data_path: '{str(data_dir)}'
+  output_filename: 'forecast.nc'
+  mask_filename: 'land_sea_mask.nc'
 """
         config_file.write_text(config_content)
 
-        # Ensure GCM_STORE is not set
-        with patch.dict(os.environ, {}, clear=True):
-            # Should default to 'lustre'
-            config = load_config(str(config_file))
-            assert config['paths']['home'] == str(test_dir)
+        config = load_config(str(config_file))
+
+        assert config['paths']['home'] == ''
+        assert config['paths']['data_path'] == str(data_dir)
+        assert config['paths']['output_filename'] == 'forecast.nc'
+        assert config['paths']['mask_filename'] == 'land_sea_mask.nc'
+
+
+class TestEdgeCases:
+    """Test edge cases and boundary conditions."""
 
     def test_path_with_spaces(self, tmp_path):
         """Should handle paths with spaces."""
@@ -403,14 +422,12 @@ paths:
 
         config_content = f"""
 paths:
-  lustre:
-    home: '{str(test_dir)}'
+  home: '{str(test_dir)}'
 """
         config_file.write_text(config_content)
 
-        with patch.dict(os.environ, {'GCM_STORE': 'lustre'}):
-            config = load_config(str(config_file))
-            assert config['paths']['home'] == str(test_dir)
+        config = load_config(str(config_file))
+        assert config['paths']['home'] == str(test_dir)
 
     def test_special_characters_in_values(self, tmp_path):
         """Should handle special characters in configuration values."""
@@ -423,15 +440,64 @@ domain: 'test-domain_v1.0'
 comment: 'This is a test: with special chars @#$%'
 
 paths:
-  lustre:
-    home: '{str(test_dir)}'
+  home: '{str(test_dir)}'
 """
         config_file.write_text(config_content)
 
-        with patch.dict(os.environ, {'GCM_STORE': 'lustre'}):
-            config = load_config(str(config_file))
-            assert config['domain'] == 'test-domain_v1.0'
-            assert 'special chars @#$%' in config['comment']
+        config = load_config(str(config_file))
+        assert config['domain'] == 'test-domain_v1.0'
+        assert 'special chars @#$%' in config['comment']
+
+    def test_mixed_valid_and_invalid_paths(self, tmp_path):
+        """Should fail if any non-skipped path is invalid."""
+        config_file = tmp_path / "test_config.yaml"
+        valid_dir = tmp_path / "valid"
+        valid_dir.mkdir()
+
+        config_content = f"""
+paths:
+  home: ''
+  valid_path: '{str(valid_dir)}'
+  output_filename: '/fake/output.nc'
+  invalid_path: '/does/not/exist'
+"""
+        config_file.write_text(config_content)
+
+        with pytest.raises(FileNotFoundError, match="Path for 'invalid_path' does not exist"):
+            load_config(str(config_file))
+
+    def test_only_skipped_paths(self, tmp_path):
+        """Should succeed when only skipped paths are present."""
+        config_file = tmp_path / "test_config.yaml"
+
+        config_content = """
+paths:
+  home: ''
+  output_filename: '/fake/output.nc'
+  input_filename: '/fake/input.nc'
+"""
+        config_file.write_text(config_content)
+
+        config = load_config(str(config_file))
+        assert config['paths']['home'] == ''
+        assert config['paths']['output_filename'] == '/fake/output.nc'
+
+    def test_relative_paths(self, tmp_path):
+        """Should handle relative paths correctly."""
+        config_file = tmp_path / "test_config.yaml"
+        
+        # Create a relative directory from tmp_path
+        rel_dir = tmp_path / "relative_dir"
+        rel_dir.mkdir()
+
+        config_content = f"""
+paths:
+  home: '{str(rel_dir)}'
+"""
+        config_file.write_text(config_content)
+
+        config = load_config(str(config_file))
+        assert config['paths']['home'] == str(rel_dir)
 
 
 if __name__ == "__main__":

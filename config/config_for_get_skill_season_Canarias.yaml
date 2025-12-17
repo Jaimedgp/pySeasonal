@@ -5,16 +5,15 @@
 
 #set path to input gcm files
 paths:
-  lustre:
-    home: '/lustre/gmeteo/PTICLIMA'
-    rundir: '/lustre/gmeteo/PTICLIMA/Scripts/SBrands/pyPTIclima/pySeasonal'
-    path_obs_base: '/lustre/gmeteo/PTICLIMA/Results/seasonal/obs/regridded'
-    path_gcm_base: '/lustre/gmeteo/PTICLIMA/Results/seasonal/gcm/aggregated' 
-    dir_netcdf: '/lustre/gmeteo/PTICLIMA/Results/seasonal/validation/'
-    dir_telcon: '/lustre/gmeteo/PTICLIMA/Results/seasonal/indices' #directory of the netCDF file containing the phases of known teleconnection indices; currently ENSO only, as generated with oni2enso.py
-    filename_telcon: 'oni2enso_195001_202505.nc' #name of the file located in <dir_telcon>
-    mask_dir: '/lustre/gmeteo/PTICLIMA/Auxiliary-material/Masks' # path to the land-sea masks on lustre
-    
+  home: '/lustre/gmeteo/PTICLIMA'
+  rundir: '/lustre/gmeteo/PTICLIMA/Scripts/SBrands/pyPTIclima/pySeasonal'
+  path_obs_base: '/lustre/gmeteo/PTICLIMA/Results/seasonal/obs/regridded'
+  path_gcm_base: '/lustre/gmeteo/PTICLIMA/Results/seasonal/gcm/aggregated'
+  dir_netcdf: '/lustre/gmeteo/PTICLIMA/Results/seasonal/validation/'
+  dir_telcon: '/lustre/gmeteo/PTICLIMA/Results/seasonal/indices' #directory of the netCDF file containing the phases of known teleconnection indices; currently ENSO only, as generated with oni2enso.py
+  filename_telcon: 'oni2enso_195001_202505.nc' #name of the file located in <dir_telcon>
+  mask_dir: '/lustre/gmeteo/PTICLIMA/Auxiliary-material/Masks' # path to the land-sea masks on lustre
+
 # Input parameters for get_skill_season.py
 input_parameters:
   obs: ['PTI-grid-v2'] # list of observational datasets used as reference for verification. Currently, only ERA5 is admitted, i.e. the list has a single item.

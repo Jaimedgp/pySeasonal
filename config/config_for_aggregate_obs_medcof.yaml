@@ -9,15 +9,14 @@ variables_nc: ['SPEI-3','FWI'] #variable names with the netCDF file
 years: [1981,2022] #years to be regridded
 
 domain: 'medcof' #spatial domain the model data is available on. So far, this is just a label used in the output filename
-domain_label: 'medcof' #domain label used in file name; <domain_label> is added for consistency with the config files for Iberia and Canarias, whose domain label within the file name is not consistent with the folder the file has been stored in ("pen" for "Iberia" and "can" for "Canarias") 
+domain_label: 'medcof' #domain label used in file name; <domain_label> is added for consistency with the config files for Iberia and Canarias, whose domain label within the file name is not consistent with the folder the file has been stored in ("pen" for "Iberia" and "can" for "Canarias")
 resolution: '1degree' #resolution shortcut used in the input variable names
 
 grid_name: 'ecmwf51' #here used as label to save the output netcdf file: ecmwf51 for 1 degree datasets, PTI-grid-v2 for downscaled datasets
 int_method: 'conservative_normed' #here used as label to save the output netcdf file, ask Adri if this method was used, 'conservative_normed' or 'upscaled'
 
 paths:
-  lustre:
-    home: '/lustre/gmeteo/PTICLIMA'
-    path_obs_base: '/lustre/gmeteo/PTICLIMA/DATA/REANALYSIS' #base path upon which the final path to the obs data is constructed
-    savepath_base: '/lustre/gmeteo/PTICLIMA/Results/seasonal/obs/regridded_test' #This is the common directory for regridded monthly observations; what is placed here will be processed by get_skill_season.py
-    rundir: '/lustre/gmeteo/PTICLIMA/Scripts/SBrands/pyPTIclima/pySeasonal' #The run directory
+  home: '/lustre/gmeteo/PTICLIMA'
+  path_obs_base: '/lustre/gmeteo/PTICLIMA/DATA/REANALYSIS' #base path upon which the final path to the obs data is constructed
+  savepath_base: '/lustre/gmeteo/PTICLIMA/Results/seasonal/obs/regridded_test' #This is the common directory for regridded monthly observations; what is placed here will be processed by get_skill_season.py
+  rundir: '/lustre/gmeteo/PTICLIMA/Scripts/SBrands/pyPTIclima/pySeasonal' #The run directory
