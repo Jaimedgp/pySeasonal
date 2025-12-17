@@ -23,14 +23,14 @@ quantile_threshold: [0.33,0.67]
 
 #set path to input gcm files
 paths:
-  home: '/lustre/gmeteo/PTICLIMA'
-  path_gcm_base: '/lustre/gmeteo/PTICLIMA/DATA/SEASONAL/seasonal-original-single-levels_derived'  # head directory of the source files
-  path_gcm_base_derived: '/lustre/gmeteo/PTICLIMA/DATA/SEASONAL/seasonal-original-single-levels_derived'  # head directory of the source files
-  path_gcm_base_masked: '/lustre/gmeteo/PTICLIMA/DATA/SEASONAL/seasonal-original-single-levels_derived'  # head directory of the source files
-  rundir: '/lustre/gmeteo/PTICLIMA/Scripts/SBrands/pyPTIclima/pySeasonal'
-  dir_quantile: '/lustre/gmeteo/PTICLIMA/Results/seasonal/validation'
-  dir_forecast: '/lustre/gmeteo/PTICLIMA/Results/seasonal/forecast'
-  mask_dir: '/lustre/gmeteo/PTICLIMA/Auxiliary-material/Masks' #path to the land-sea masks
+  home: '/lustre/gmeteo/PTICLIMA/'
+  path_gcm_base: 'DATA/SEASONAL/seasonal-original-single-levels_derived'  # head directory of the source files
+  path_gcm_base_derived: 'DATA/SEASONAL/seasonal-original-single-levels_derived'  # head directory of the source files
+  path_gcm_base_masked: 'DATA/SEASONAL/seasonal-original-single-levels_derived'  # head directory of the source files
+  rundir: 'Scripts/SBrands/pyPTIclima/pySeasonal'
+  dir_quantile: 'Results/seasonal/validation'
+  dir_forecast: 'Results/seasonal/forecast'
+  mask_dir: 'Auxiliary-material/Masks' #path to the land-sea masks
 
 # Parameters per model
 model_settings:
