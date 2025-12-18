@@ -30,8 +30,6 @@ paths:
   home: '/lustre/gmeteo/PTICLIMA/'
   path_gcm_base: 'DATA/SEASONAL/seasonal-original-single-levels' # head directory of the source files
   path_gcm_base_derived: 'DATA/SEASONAL/seasonal-original-single-levels_derived' # head directory of the source files
-  path_gcm_base_masked: 'DATA/SEASONAL/seasonal-original-single-levels_masked' # head directory of the source files
-  rundir: 'Scripts/SBrands/pyPTIclima/pySeasonal'
   dir_quantile: 'Results/seasonal/validation'
   dir_forecast: 'Results/seasonal/forecast'
   mask_dir: 'Auxiliary-material/Masks' #path to the land-sea masks

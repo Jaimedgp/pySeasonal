@@ -41,10 +41,8 @@ def swen_pred2tercile_operational(config: dict, year_init: str, month_init: str)
 
     # Extract paths from configuration
     paths = config['paths'] # get paths from configuration
-    home = paths['home']
     path_gcm_base = paths['path_gcm_base']
     path_gcm_base_derived = paths['path_gcm_base_derived']
-    path_gcm_base_masked = paths['path_gcm_base_masked']
     dir_quantile = paths['dir_quantile']
     dir_forecast = paths['dir_forecast']
     mask_dir = paths['mask_dir']

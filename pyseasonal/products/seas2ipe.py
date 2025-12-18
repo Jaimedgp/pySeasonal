@@ -16,7 +16,6 @@ def swen_seas2ipe(config: dict, year_init: str, month_init: str):
     vers = config['version']
     model = config['model']
     version = config['model_version']
-    obs = config['obs']
     years_quantile = config['years_quantile']
     subperiod = config['subperiod']
     score = config['score']
@@ -30,7 +29,6 @@ def swen_seas2ipe(config: dict, year_init: str, month_init: str):
     datatype = config['datatype']
     domain = config['domain']
     detrended = config['detrended']
-    quantile_threshold = config['quantile_threshold']
 
     # Get paths from configuration
     paths = config['paths']
@@ -42,11 +40,7 @@ def swen_seas2ipe(config: dict, year_init: str, month_init: str):
         raise ValueError('<variables_std> and <variables_out> must have the same length !')
 
     # Extract paths from configuration
-    home = paths['home']
-    server = paths['server']
     path_gcm_base = paths['path_gcm_base']
-    path_gcm_base_derived = paths['path_gcm_base_derived']
-    path_gcm_base_masked = paths['path_gcm_base_masked']
     dir_validation = paths['dir_validation'] + '/' + vers
     dir_forecast = paths['dir_forecast']
     dir_output = paths['dir_output']
